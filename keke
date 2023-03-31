@@ -1,0 +1,38 @@
+import requests
+import json
+import time
+
+# Binance API credentials
+api_key = 'YOUR_API_KEY'
+api_secret = 'YOUR_API_SECRET'
+
+# Order parameters
+symbol = 'BTCUSDT'
+side = 'BUY'
+type = 'MARKET'
+quantity = 0.001
+
+# API endpoint
+url = 'https://api.binance.com/api/v3/order'
+
+# Generate timestamp
+timestamp = int(time.time() * 1000)
+
+# Generate signature
+payload = 'symbol=' + symbol + '&side=' + side + '&type=' + type + '&quantity=' + str(quantity) + '&timestamp=' + str(timestamp)
+signature = hmac.new(api_secret.encode('utf-8'), payload.encode('utf-8'), hashlib.sha256).hexdigest()
+
+# Add parameters and signature to request headers
+headers = {'X-MBX-APIKEY': api_key}
+params = {'symbol': symbol, 'side': side, 'type': type, 'quantity': quantity, 'timestamp': timestamp, 'signature': signature}
+
+# Send order request
+response = requests.post(url, headers=headers, params=params)
+
+# Parse response
+if response.status_code == 200:
+    data = response.json()
+    if data['orderId']:
+        print('Order executed successfully')
+else:
+    print('Failed to execute order')
